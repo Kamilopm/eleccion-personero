@@ -13,12 +13,17 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 // Función auxiliar para parsear el body
 async function parseBody(req) {
+  // En Vercel, el body ya puede venir parseado
+  if (req.body) {
+    return req.body;
+  }
+  
   return new Promise((resolve) => {
     let body = '';
     req.on('data', chunk => { body += chunk.toString(); });
     req.on('end', () => {
       try {
-        resolve(JSON.parse(body));
+        resolve(body ? JSON.parse(body) : {});
       } catch {
         resolve({});
       }
@@ -38,6 +43,9 @@ export default async function handler(req, res) {
   }
 
   const path = req.query.path ? req.query.path.join('/') : '';
+  
+  // Log para debugging (puedes ver esto en Vercel Logs)
+  console.log('Request:', req.method, 'Path:', path, 'URL:', req.url);
 
   try {
     // HEALTH CHECK
@@ -46,9 +54,11 @@ export default async function handler(req, res) {
     }
 
     // VERIFICAR CÓDIGO DE ADMIN
-    if (path === 'admin/verify') {
+    if (path === 'admin/verify' && req.method === 'POST') {
       const body = await parseBody(req);
       const { admin_code } = body;
+      
+      console.log('Admin verify - Código recibido:', admin_code ? 'SÍ' : 'NO');
 
       const { data, error } = await supabase
         .from('config')
@@ -57,8 +67,11 @@ export default async function handler(req, res) {
         .single();
 
       if (error || !data) {
+        console.error('Error al consultar config:', error);
         return res.status(500).json({ error: 'Error al verificar código' });
       }
+      
+      console.log('Código en DB:', data.admin_code, 'Código recibido:', admin_code);
 
       if (data.admin_code === admin_code) {
         return res.status(200).json({ valid: true });
@@ -509,7 +522,27 @@ export default async function handler(req, res) {
     }
 
     // Ruta no encontrada
-    return res.status(404).json({ error: 'Ruta no encontrada' });
+    console.log('⚠️ Ruta no encontrada:', path, 'Método:', req.method);
+    return res.status(404).json({ 
+      error: 'Ruta no encontrada',
+      path: path,
+      method: req.method,
+      availableRoutes: [
+        'GET /api/health',
+        'GET /api/config',
+        'GET /api/candidates',
+        'POST /api/admin/verify',
+        'POST /api/admin/election-status',
+        'POST /api/admin/import-students',
+        'POST /api/admin/students',
+        'POST /api/admin/students/delete',
+        'POST /api/admin/candidates/add',
+        'POST /api/admin/candidates/delete',
+        'POST /api/vote/verify',
+        'POST /api/vote/cast',
+        'POST /api/admin/stats'
+      ]
+    });
 
   } catch (error) {
     console.error('Error en handler:', error);
