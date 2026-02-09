@@ -31,6 +31,11 @@ async function parseBody(req) {
   });
 }
 
+// Función auxiliar para verificar rutas
+function matchRoute(req, path, routePath) {
+  return path === routePath || req.url.includes(`/api/${routePath}`);
+}
+
 // Handler principal con enrutamiento manual
 export default async function handler(req, res) {
   // Configurar CORS
@@ -42,19 +47,29 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  const path = req.query.path ? req.query.path.join('/') : '';
+  // Obtener la ruta correctamente
+  let path = '';
+  if (req.query.path && Array.isArray(req.query.path)) {
+    path = req.query.path.join('/');
+  } else if (req.query.path) {
+    path = req.query.path;
+  } else {
+    // Extraer de la URL si no viene en query
+    const urlPath = req.url.replace('/api/', '').split('?')[0];
+    path = urlPath;
+  }
   
   // Log para debugging (puedes ver esto en Vercel Logs)
-  console.log('Request:', req.method, 'Path:', path, 'URL:', req.url);
+  console.log('Request:', req.method, 'Path:', path, 'URL:', req.url, 'Query:', req.query);
 
-  try {
+  try:
     // HEALTH CHECK
-    if (path === 'health') {
+    if (matchRoute(req, path, 'health')) {
       return res.status(200).json({ ok: true });
     }
 
     // VERIFICAR CÓDIGO DE ADMIN
-    if (path === 'admin/verify' && req.method === 'POST') {
+    if (matchRoute(req, path, 'admin/verify') && req.method === 'POST') {
       const body = await parseBody(req);
       const { admin_code } = body;
       
@@ -81,7 +96,7 @@ export default async function handler(req, res) {
     }
 
     // OBTENER CONFIGURACIÓN
-    if (path === 'config') {
+    if (matchRoute(req, path, 'config')) {
       const { data, error } = await supabase
         .from('config')
         .select('election_status')
@@ -96,7 +111,7 @@ export default async function handler(req, res) {
     }
 
     // ACTUALIZAR ESTADO DE VOTACIÓN
-    if (path === 'admin/election-status' && req.method === 'POST') {
+    if (matchRoute(req, path, 'admin/election-status') && req.method === 'POST') {
       const body = await parseBody(req);
       const { admin_code, status } = body;
 
@@ -125,7 +140,7 @@ export default async function handler(req, res) {
     }
 
     // IMPORTAR ESTUDIANTES DESDE EXCEL
-    if (path === 'admin/import-students' && req.method === 'POST') {
+    if (matchRoute(req, path, 'admin/import-students') && req.method === 'POST') {
       const body = await parseBody(req);
       const { admin_code, file_base64, filename } = body;
 
@@ -269,7 +284,7 @@ export default async function handler(req, res) {
     }
 
     // OBTENER ESTUDIANTES
-    if (path === 'admin/students') {
+    if (matchRoute(req, path, 'admin/students')) {
       const body = req.method === 'POST' ? await parseBody(req) : {};
       const { admin_code } = body;
 
@@ -299,7 +314,7 @@ export default async function handler(req, res) {
     }
 
     // ELIMINAR ESTUDIANTE
-    if (path === 'admin/students/delete' && req.method === 'POST') {
+    if (matchRoute(req, path, 'admin/students/delete') && req.method === 'POST') {
       const body = await parseBody(req);
       const { admin_code, student_id } = body;
 
@@ -327,7 +342,7 @@ export default async function handler(req, res) {
     }
 
     // OBTENER CANDIDATOS
-    if (path === 'candidates') {
+    if (matchRoute(req, path, 'candidates')) {
       const { data, error } = await supabase
         .from('candidates')
         .select('*')
@@ -341,7 +356,7 @@ export default async function handler(req, res) {
     }
 
     // AGREGAR CANDIDATO
-    if (path === 'admin/candidates/add' && req.method === 'POST') {
+    if (matchRoute(req, path, 'admin/candidates/add') && req.method === 'POST') {
       const body = await parseBody(req);
       const { admin_code, name, party } = body;
 
@@ -369,7 +384,7 @@ export default async function handler(req, res) {
     }
 
     // ELIMINAR CANDIDATO
-    if (path === 'admin/candidates/delete' && req.method === 'POST') {
+    if (matchRoute(req, path, 'admin/candidates/delete') && req.method === 'POST') {
       const body = await parseBody(req);
       const { admin_code, candidate_id } = body;
 
@@ -397,7 +412,7 @@ export default async function handler(req, res) {
     }
 
     // VERIFICAR CÓDIGO DE VOTACIÓN
-    if (path === 'vote/verify' && req.method === 'POST') {
+    if (matchRoute(req, path, 'vote/verify') && req.method === 'POST') {
       const body = await parseBody(req);
       const { access_code } = body;
 
@@ -422,7 +437,7 @@ export default async function handler(req, res) {
     }
 
     // EMITIR VOTO (usando función SQL atómica)
-    if (path === 'vote/cast' && req.method === 'POST') {
+    if (matchRoute(req, path, 'vote/cast') && req.method === 'POST') {
       const body = await parseBody(req);
       const { access_code, candidate_id } = body;
 
@@ -457,7 +472,7 @@ export default async function handler(req, res) {
     }
 
     // OBTENER ESTADÍSTICAS
-    if (path === 'admin/stats') {
+    if (matchRoute(req, path, 'admin/stats')) {
       const body = req.method === 'POST' ? await parseBody(req) : {};
       const { admin_code } = body;
 
