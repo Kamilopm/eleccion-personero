@@ -1,0 +1,13 @@
+{
+  "name": "votacion-escolar",
+  "version": "1.0.0",
+  "description": "Sistema de votación escolar para Vercel + Supabase",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "xlsx": "^0.18.5"
+  }
+}
