@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Votación Escolar</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗳️ Sistema de Votación Escolar</h1>
+            <p class="subtitle">Ingresa tu código de votación</p>
+        </div>
+
+        <div id="statusMessage" class="status-message"></div>
+
+        <div class="card">
+            <form id="accessForm">
+                <div class="form-group">
+                    <label for="accessCode">Código de Votación</label>
+                    <input 
+                        type="text" 
+                        id="accessCode" 
+                        placeholder="Ejemplo: 6112" 
+                        required
+                        pattern="[0-9]+"
+                        maxlength="6"
+                    >
+                    <small>Tu código tiene el formato: Grado + Curso + Lista</small>
+                </div>
+                <button type="submit" class="btn btn-primary">Continuar</button>
+            </form>
+        </div>
+
+        <div class="footer">
+            <a href="/admin.html" class="link-admin">Acceso Administrador</a>
+        </div>
+    </div>
+
+    <script src="/app.js"></script>
+</body>
+</html>

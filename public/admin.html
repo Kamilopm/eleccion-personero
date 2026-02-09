@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Login -->
+        <div id="loginSection">
+            <div class="header">
+                <h1>🔐 Acceso Administrador</h1>
+            </div>
+
+            <div id="statusMessage" class="status-message"></div>
+
+            <div class="card">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="adminCode">Código de Administrador</label>
+                        <input 
+                            type="password" 
+                            id="adminCode" 
+                            placeholder="Ingresa el código" 
+                            required
+                        >
+                    </div>
+                    <button type="submit" class="btn btn-primary">Ingresar</button>
+                </form>
+            </div>
+
+            <div class="footer">
+                <a href="/" class="link-back">← Volver al inicio</a>
+            </div>
+        </div>
+
+        <!-- Panel de Administración -->
+        <div id="adminPanel" style="display: none;">
+            <div class="header">
+                <h1>📊 Panel de Administración</h1>
+                <button id="logoutBtn" class="btn btn-secondary btn-sm">Cerrar Sesión</button>
+            </div>
+
+            <div id="adminStatus" class="status-message"></div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="students">Estudiantes</button>
+                <button class="tab-btn" data-tab="candidates">Candidatos</button>
+                <button class="tab-btn" data-tab="election">Votación</button>
+                <button class="tab-btn" data-tab="stats">Estadísticas</button>
+            </div>
+
+            <!-- Tab: Estudiantes -->
+            <div id="studentsTab" class="tab-content active">
+                <div class="card">
+                    <h2>Importar Estudiantes desde Excel</h2>
+                    <p>El archivo debe contener las columnas: <strong>Nombre, Grado, Curso</strong> (Lista es opcional)</p>
+                    
+                    <div class="form-group">
+                        <input type="file" id="excelFile" accept=".xlsx,.xls,.csv">
+                        <button id="importBtn" class="btn btn-primary">Importar Estudiantes</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Estudiantes Registrados (<span id="studentCount">0</span>)</h2>
+                    <button id="refreshStudents" class="btn btn-secondary btn-sm">Actualizar Lista</button>
+                    <div id="studentsTable" class="table-container">
+                        <!-- Tabla se carga aquí -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Candidatos -->
+            <div id="candidatesTab" class="tab-content">
+                <div class="card">
+                    <h2>Agregar Candidato</h2>
+                    <form id="addCandidateForm">
+                        <div class="form-group">
+                            <label for="candidateName">Nombre del Candidato</label>
+                            <input type="text" id="candidateName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="candidateParty">Partido / Lista</label>
+                            <input type="text" id="candidateParty" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Agregar Candidato</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2>Candidatos Registrados</h2>
+                    <div id="candidatesTable" class="table-container">
+                        <!-- Tabla se carga aquí -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Votación -->
+            <div id="electionTab" class="tab-content">
+                <div class="card">
+                    <h2>Control de Votación</h2>
+                    <div class="election-status">
+                        <p>Estado actual: <strong id="electionStatus">Cargando...</strong></p>
+                        <div class="btn-group">
+                            <button id="openElection" class="btn btn-success">Abrir Votación</button>
+                            <button id="closeElection" class="btn btn-danger">Cerrar Votación</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Estadísticas -->
+            <div id="statsTab" class="tab-content">
+                <div class="card">
+                    <h2>Estadísticas de Votación</h2>
+                    <button id="refreshStats" class="btn btn-secondary btn-sm">Actualizar</button>
+                    <div id="statsContainer">
+                        <!-- Estadísticas se cargan aquí -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/admin.js"></script>
+</body>
+</html>
